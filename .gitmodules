@@ -1,0 +1,3 @@
+[submodule "test_scDeepClust/scDeepCluster"]
+	path = test_scDeepClust/scDeepCluster
+	url = https://github.com/ttgump/scDeepCluster.git

@@ -1,4 +1,5 @@
 import os
+import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 plt.rcParams.update({'font.size': 18})
@@ -20,11 +21,13 @@ def plot_metrics_bar(result_dirs, plot_dir, metrics="Acc", prefix="pancreas",
     res_dict = {}
     for result_dir in result_dirs:
         basename = os.path.basename(result_dir)
-        basename = basename.replace("result_"+prefix+'_', '')
         res_dict[basename] = {}
         files = [x for x in os.listdir(result_dir) if x.endswith("_metrics.txt")]
         methods = [x.replace("_metrics.txt", "") for x in files] ## get all methods
         for method in methods:
+            if method in ['MLP_GO', 'MLP_CP', 'MLP_focal', 'DFN']:
+                continue
+
             res_dict[basename][method] = {}
             with open(result_dir+os.sep+method+"_metrics.txt", 'r') as fopen:
                 for line in fopen:
@@ -59,8 +62,8 @@ def plot_metrics_bar(result_dirs, plot_dir, metrics="Acc", prefix="pancreas",
         plt.xlabel("Classifiers")
 
     ## set y axis range
-    global_min = df.to_numpy().min()
-    global_max = df.to_numpy().max()
+    global_min = np.nanmin(df.to_numpy())
+    global_max = np.nanmax(df.to_numpy())
     if "Acc" == metrics or "macroF1" == metrics:
         min_y_axis = max(global_min*0.95, 0)
         max_y_axis = min(global_max*1.05, 1)
@@ -170,22 +173,22 @@ def plot_feature_number(pipeline_dir, prefix, method="MLP", metrics="Acc"):
     plt.savefig(pipeline_dir+os.sep+prefix+metrics+'_n_features.png')
 
 if __name__ == '__main__':
-    pipeline_dir = "/home/wma36/gpu/sc_identifier/pipelines/"
+    pipeline_dir = "/home/wma36/gpu/celltyping_refConstruct/pipelines/result_Pancreas_collections/result_pancreas_seg_to_muraro"
     sub_dirs = next(os.walk(pipeline_dir))[1]
 
-    prefix="PBMC_batch1_ABC_A_to_B"
-
-    result_dirs = [pipeline_dir+os.sep+x for x in sub_dirs if prefix in x]
+    prefix=os.path.basename(pipeline_dir).replace('result_', '')
+    #result_dir = pipeline_dir+os.sep+'result_'+prefix
+    result_dirs = [pipeline_dir+os.sep+x for x in sub_dirs]
 
     groupby = "methods"  ## features/methods
     plot_metrics_bar(result_dirs, pipeline_dir, metrics="Acc", prefix=prefix, groupby=groupby)
     plot_metrics_bar(result_dirs, pipeline_dir, metrics="ARI", prefix=prefix, groupby=groupby)
     plot_metrics_bar(result_dirs, pipeline_dir, metrics="macroF1", prefix=prefix, groupby=groupby)
-    plot_metrics_bar(result_dirs, pipeline_dir, metrics="runtime", prefix=prefix, groupby=groupby)
+    #plot_metrics_bar(result_dirs, pipeline_dir, metrics="runtime", prefix=prefix, groupby=groupby)
 
-    extract_sub_prediction(result_dirs, datatype="mousebrain_sub")
+    #extract_sub_prediction(result_dirs, datatype="mousebrain_sub")
 
-    method = "MLP"
+    #method = "MLP"
     #plot_feature_number(pipeline_dir, prefix, method=method, metrics="Acc")
     #plot_feature_number(pipeline_dir, prefix, method=method, metrics="ARI")
     #plot_feature_number(pipeline_dir, prefix, method=method, metrics="macroF1")

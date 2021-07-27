@@ -16,13 +16,32 @@ n_features <- args[5]
 train <- args[6]
 test <- args[7]
 
-pipeline_dir <- "/home/wma36/gpu/sc_identifier/pipelines"
-result_prefix <- file.path(pipeline_dir, paste("result", data_source,
-            train, 'to', test, sep='_'))
+if (data_source %in% c("PBMC_batch1_ind", "PBMC_batch1_ABC", "PBMC_batch2", 
+                "PBMC_batch1_batchtoind", "PBMC_protocols_pbmc1", "PBMC_protocols_batch_smart"))
+    pipeline_dir = "/home/wma36/gpu/celltyping_refConstruct/pipelines/result_PBMC_collections"
+if (data_source %in% c("PBMC_protocols_pbmc1", "PBMC_protocols_batch_smart"))
+    pipeline_dir = "/home/wma36/gpu/celltyping_refConstruct/pipelines/result_PBMC_protocols_collections"
+if (data_source %in% c("PBMC_Zheng_FACS", "PBMC_Zheng_FACS_curated", "PBMC_cross"))
+    pipeline_dir = "/home/wma36/gpu/celltyping_refConstruct/pipelines/result_PBMC_Zheng_collections"
+if (data_source %in% c("pancreas", "pancreas_seg_cond", "pancreas_custom",
+                "pancreas_seg_mix", "pancreas_multi_to_multi"))
+    pipeline_dir = "/home/wma36/gpu/celltyping_refConstruct/pipelines/result_Pancreas_collections"
+if (data_source %in% c("mousebrain_FC", "mousebrain_FC_sub", "mousebrain_HC", "mousebrain_HC_sub",
+                "mousebrain_region", "mousebrain_FC_stage", "mousebrain_FC_stage_sub", "mousebrain_FC_datasets",
+                "mousebrain_FC_datasets_multiinds", "mousebrain_FC_datasets_multiinds_sample",
+                "mousebrain_FC_multiinds", "mousebrain_FC_multiinds_sub", "mousebrain_FC_multiinds_sample",
+                "mousebrain_FC_multiinds_sub_sample"))
+    pipeline_dir = "/home/wma36/gpu/celltyping_refConstruct/pipelines/result_Mousebrain_collections"
+if (data_source %in% c("allenbrain_ss", "allenbrain_10x", "allenbrain_cross"))
+    pipeline_dir = "/home/wma36/gpu/celltyping_refConstruct/pipelines/result_Allenbrain_collections"
+
+result_prefix <- file.path(pipeline_dir, 
+                paste("result", data_source, train, 'to', test, sep='_'))
 if (select_on == "NA" && select_method == "NA") {
     result_dir <- file.path(result_prefix, "no_feature")
 } else {
-    result_dir <- file.path(result_prefix, paste(select_method, n_features, 'on', select_on, sep='_'))
+    result_dir <- file.path(result_prefix, 
+                paste(select_method, n_features, 'on', select_on, sep='_'))
 }
 dir.create(result_dir)
 
@@ -70,6 +89,47 @@ if ("PBMC_protocols_batch_smart" == data_source) {
 
     test_idx <- colData(ref)$Method == "Smart-seq2" & colData(ref)$Experiment == test
     target_data <- ref[, test_idx]
+
+    ## curate for same cell types
+    res <- ref_target_common_cells(ref_data, target_data, method=method)
+    ref_data <- res$ref
+    target_data <- res$target
+}
+
+if ("PBMC_Zheng_FACS" == data_source || "PBMC_Zheng_FACS_curated" == data_source) {
+    if (grepl("curated", data_source))
+        ref = PBMC_Zheng_ref(data_dir, method=method, curate=TRUE)
+    else
+        ref = PBMC_Zheng_ref(data_dir, method=method)
+
+    ref_data = ref_downsample(ref, size=round(ncol(ref)*as.numeric(train)))
+    target_data = ref[, -which(colnames(ref) %in% colnames(ref_data))]
+}
+
+if ("PBMC_cross" == data_source) {
+    ref = PBMC_Zheng_ref(data_dir, method=method, curate=TRUE)
+    data = ref_downsample(ref, size=round(ncol(ref)*0.8))
+    target_data = ref[, -which(colnames(ref) %in% colnames(data))]
+
+    input = unlist(strsplit(train, '_'))
+    dataset = input[1]
+    infos = input[2]
+
+    ## depends on when train is Kang and Ding
+    if ("Kang" == dataset)
+        if (is.na(infos)) {
+            ref_data = PBMC_batch1_ind_ref(data_dir, ind="1154", method=method)
+        } else if (infos == "batch1") {
+            ref_data = PBMC_batch1_ind_ref(data_dir, method=method)
+        }
+    if ("Ding" == dataset)
+        if (is.na(infos)) {
+            ref_data = PBMC_protocols_ref(data_dir, method=method, 
+                            exp="pbmc2", protocol="10x-v2", curate=T)
+        } else if (infos == "droplet") {
+            ref_data = PBMC_protocols_ref(data_dir, method=method,
+                            exp="pbmc2", protocol_type=infos, curate=T)
+        }
 
     ## curate for same cell types
     res <- ref_target_common_cells(ref_data, target_data, method=method)
@@ -320,6 +380,40 @@ if ("mousebrain_FC_datasets_multiinds" == data_source |
     }
 }
 
+if ("allenbrain_ss" == data_source) {
+    ## Allen brain Smart-Seqv4 80% as training, 20% as test
+    ref = allenbrain_ss_ref(data_dir, method=method, curate=TRUE)
+    ref_data = ref_downsample(ref, size=round(ncol(ref)*as.numeric(train)))
+    target_data = ref[, -which(colnames(ref) %in% colnames(ref_data))]
+}
+
+if ("allenbrain_10x" == data_source) {
+    ## Allen brain 10X one individual to predict another
+    ref_data = allenbrain_10x_ref(data_dir, method=method, ind=train, curate=TRUE) 
+    target_data = allenbrain_10x_ref(data_dir, method=method, ind=test, curate=TRUE)
+}
+
+if ("allenbrain_cross" == data_source) {
+    ## Allen brain Smart-Seqv4 80% as training, 20% as test
+    ref = allenbrain_ss_ref(data_dir, method=method, curate=TRUE)
+    ref_data = ref_downsample(ref, size=round(ncol(ref)*0.8))
+    target_data = ref[, -which(colnames(ref) %in% colnames(ref_data))]
+
+    ## FC/pFC as reference
+    if ("FC" == train) {
+        ref_data = mousebrain_ind_ref(data_dir, region="FC", ind="P60FCRep1", 
+                        method=method, curate=T)
+    }
+    if ("pFC" == train) {
+        ref_data = mousebrain_FC_stage_ref(data_dir, stage="Adult", 
+                        ind="PFCSample1", method=method, curate=T)
+    }
+    res <- ref_target_common_cells(ref_data, target_data, method=method)
+    ref_data <- res$ref
+    target_data <- res$target
+}
+
+
 ## extract number of clusters from reference data
 if ("scmap" == method) {
     n_clusters <- length(unique(colData(ref_data)$cell_type1))
@@ -327,6 +421,13 @@ if ("scmap" == method) {
     n_clusters <- length(unique(colData(ref_data)$celltypes))
 }
 cat("Number of cell types: ", n_clusters, '\n')
+
+## filter data to express in at least 10 cells and 10 genes
+ref_data = filter_sce(ref_data)
+target_data = filter_sce(target_data)
+common_genes = intersect(rownames(ref_data), rownames(target_data))
+ref_data = ref_data[common_genes,]
+target_data = target_data[common_genes,]
 
 ptm <- proc.time()
 if (method == "scmap") {

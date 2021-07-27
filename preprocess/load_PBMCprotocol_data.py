@@ -6,7 +6,7 @@ import pandas as pd
 # --------------
 # load PBMC protocols function
 # --------------
-def load_PBMC_protocols_data(data_dir):
+def load_PBMC_protocols_data(data_dir, exp=None, protocol=None, protocol_type=None, curate=False):
     '''load PBMC from different protocols
 
     After comparing between cells.read.new.txt and cells.umi.new.txt, the cell names
@@ -17,13 +17,20 @@ def load_PBMC_protocols_data(data_dir):
     - Extract out droplet-based cells from counts.umi.txt
     - Concatenate to anndata
 
+    @ exp: pbmc1 (froze) and pbmc2 (fresh)
     @ protocol: plate-based (Smart-Seq2/CEL-Seq2), droplet-based (10X v2, 10X v3,
     Drop-seq, Seq-Well, inDrops)
+    @ protocol_type: plate or droplet
     '''
     plate_protocols = ["CEL-Seq2", "Smart-seq2"]
-
     metadata_df = pd.read_csv(data_dir+os.sep+"PBMC_protocols/metadata.txt", 
             header=0, sep="\t")
+    if curate:
+        metadata_df["CellType"].replace(["B cell"], 'B cells', inplace=True)
+        metadata_df["CellType"].replace(["CD14+ monocyte"], 'CD14+ Monocytes', inplace=True)
+        metadata_df["CellType"].replace(["CD4+ T cell"], 'CD4 T cells', inplace=True)
+        metadata_df["CellType"].replace(["Cytotoxic T cell"], 'CD8 T cells', inplace=True)
+        metadata_df["CellType"].replace(["Natural killer cell"], 'NK cells', inplace=True)
 
     ## plate-based data
     read_adata = anndata.read_mtx(data_dir+os.sep+"PBMC_protocols/counts.read.txt").T
@@ -31,22 +38,18 @@ def load_PBMC_protocols_data(data_dir):
             header=None)
     read_genes = pd.read_csv(data_dir+os.sep+"PBMC_protocols/genes.read.txt",
             header=None)
-
     read_adata.var['gene_symbols'] = [x.split('_')[1] for x in read_genes[0].values]
     read_adata.var_names = read_adata.var['gene_symbols']
     read_adata.var_names_make_unique(join="-") # make unique
     read_adata.var_names.name = None
-
     read_adata.obs['barcode'] = read_cells[0].values
     read_adata.obs_names = read_adata.obs['barcode']
     read_adata.obs_names_make_unique(join="-") ## make unique
     read_adata.obs_names.name = None
-
     plate_metadata = metadata_df[metadata_df['Method'].isin(plate_protocols)]
     common_cells = set(plate_metadata['NAME']).intersection(set(read_adata.obs_names))
     common_cells = list(common_cells)
     read_adata = read_adata[common_cells] # 1052 cells
-
     obs_df = read_adata.obs.merge(plate_metadata, how='left', 
             left_index=True, right_on='NAME')
     obs_df.index = obs_df['barcode'].values
@@ -58,22 +61,18 @@ def load_PBMC_protocols_data(data_dir):
             header=None)
     umi_genes = pd.read_csv(data_dir+os.sep+"PBMC_protocols/genes.umi.txt",
             header=None)
-
     umi_adata.var['gene_symbols'] = [x.split('_')[1] for x in umi_genes[0].values]
     umi_adata.var_names = umi_adata.var['gene_symbols']
     umi_adata.var_names_make_unique(join="-") # make unique
     umi_adata.var_names.name = None
-
     umi_adata.obs['barcode'] = umi_cells[0].values
     umi_adata.obs_names = umi_adata.obs['barcode']
     umi_adata.obs_names_make_unique(join="-") ## make unique
     umi_adata.obs_names.name = None
-
     droplet_metadata = metadata_df[~metadata_df['Method'].isin(plate_protocols)]
     common_cells = set(droplet_metadata['NAME']).intersection(set(umi_adata.obs_names))
     common_cells = list(common_cells)
     umi_adata = umi_adata[common_cells] # 29969 cells
-
     obs_df = umi_adata.obs.merge(droplet_metadata, how='left', 
             left_index=True, right_on='NAME')
     obs_df.index = obs_df['barcode'].values
@@ -89,5 +88,17 @@ def load_PBMC_protocols_data(data_dir):
         '10x Chromium (v2) B'], '10x-v2', inplace=True)
     adata_obs['Method'].replace(['10x Chromium (v3)'], '10x-v3', inplace=True)
     adata.obs = adata_obs
+
+    if exp is not None:
+        exp_cells = adata.obs[adata.obs['Experiment'].isin(exp.split('_'))].index
+        adata = adata[exp_cells]
+
+    if protocol is not None:
+        prot_cells = adata.obs[adata.obs['Method'].isin(protocol.split('_'))].index
+        adata = adata[prot_cells]
+
+    if protocol_type is not None:
+        prot_type_cells = adata.obs[adata.obs['protocol_type'] == protocol_type].index
+        adata = adata[prot_type_cells]
 
     return adata 

@@ -11,20 +11,21 @@ processed_counts <- process_Y(counts, thre=0)
 rm(counts) # release memory
 
 if (ncol(processed_counts) > 5000) {
-    F_res <- Consensus_F2(processed_counts, top=n_features, k=n_celltypes, 
-                      split=T, batch_size=2000, num_cores=4)
+    F_res_idx <- FEAST_fast(processed_counts, k=n_celltypes, 
+                      split=T, batch_size=2000)
 } else if (ncol(processed_counts) > 1000) {
-    F_res <- Consensus_F2(processed_counts, top=n_features, k=n_celltypes, 
-                      split=T, batch_size=500, num_cores=4)
+    F_res_idx <- FEAST_fast(processed_counts, k=n_celltypes, 
+                      split=T, batch_size=500)
 } else if (ncol(processed_counts) > 500){
-    F_res <- Consensus_F2(processed_counts, top=n_features, k=n_celltypes, 
+    F_res_idx <- FEAST_fast(processed_counts, k=n_celltypes, 
                       split=T, batch_size=200, num_cores=4)
 } else {
-    F_res <- Consensus_F2(processed_counts, top=n_features, k=n_celltypes, 
+    F_res_idx <- FEAST_fast(processed_counts, k=n_celltypes, 
                       split=F, num_cores=4)
 }
 
-names(F_res) <- rownames(processed_counts)
-ixs <- order(F_res, decreasing=T)[1:n_features]
-features <- names(F_res[ixs])
+#names(F_res) <- rownames(processed_counts)
+#ixs <- order(F_res, decreasing=T)[1:n_features]
+#features <- names(F_res[ixs])
+features = rownames(processed_counts)[F_res_idx[1:n_features]]
 write(features, file.path(dirname(df_dir), "FEAST_features.txt"))

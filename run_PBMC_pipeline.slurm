@@ -1,15 +1,17 @@
 #!/bin/bash
 #SBATCH --job-name=PBMC
-#SBATCH --output=celltyping_PBMC.out
+#SBATCH --output=celltyping_PBMC_cross_Ding.out
 #SBATCH --gres=gpu:1
+#SBATCH --cpus-per-task=32
+
 source ~/.bashrc
-conda activate /home/wma36/gpu/sc_identifier/envs/desc_tfv1
+conda activate /home/wma36/gpu/envs/celltyping
 
-cd /homelocal/wma36/sc_identifier
+cd /home/wma36/gpu/celltyping_refConstruct
 
-PIPELINE_DIR="/home/wma36/gpu/sc_identifier/pipelines"
+PIPELINE_DIR="/home/wma36/gpu/celltyping_refConstruct/pipelines"
 
-declare -a celltyping_python=("MLP" "GEDFN" "ItClust" "SVM_RBF" "SVM_linear" "RF")
+declare -a celltyping_python=("MLP" "GEDFN" "ItClust" "RF" "SVM_RBF" "SVM_linear")
 #declare -a celltyping_python=("MLP_GO" "MLP_CP")
 declare -a celltyping_R=("scmap" "CHETAH")
 
@@ -21,9 +23,9 @@ test="1085"
 ## python pipeline
 # **jiaying**: using CUDA_VISIBLE_DEVICES=-1 and 
 # directly `sh thisfile.slurm` instead of `slurm thisfile.slurm`
-#CUDA_VISIBLE_DEVICES=-1 python -m pipelines.pipeline $task -m MLP --select_on train --select_method F-test --train $train --test $test
-#CUDA_VISIBLE_DEVICES=-1 python -m pipelines.pipeline $task -m GEDFN --select_on train --select_method F-test --train $train --test $test
-#CUDA_VISIBLE_DEVICES=-1 python -m pipelines.pipeline $task -m ItClust --select_on train --select_method F-test --train $train --test $test
+#CUDA_VISIBLE_DEVICES=-1 python -m pipelines.PBMC_pipeline $task -m MLP --select_on train --select_method F-test --train $train --test $test
+#CUDA_VISIBLE_DEVICES=-1 python -m pipelines.PBMC_pipeline $task -m GEDFN --select_on train --select_method F-test --train $train --test $test
+#CUDA_VISIBLE_DEVICES=-1 python -m pipelines.PBMC_pipeline $task -m ItClust --select_on train --select_method F-test --train $train --test $test
 
 ## ==== PBMC batch1 A -> B
 task="PBMC_batch1_ABC"
@@ -39,9 +41,9 @@ test="stimulated"
 ## python pipeline
 # **jiaying**: using CUDA_VISIBLE_DEVICES=-1 and 
 # directly `sh thisfile.slurm` instead of `slurm thisfile.slurm`
-CUDA_VISIBLE_DEVICES=-1 python -m pipelines.pipeline $task -m MLP --select_on train --select_method F-test --train $train --test $test
-CUDA_VISIBLE_DEVICES=-1 python -m pipelines.pipeline $task -m GEDFN --select_on train --select_method F-test --train $train --test $test
-CUDA_VISIBLE_DEVICES=-1 python -m pipelines.pipeline $task -m ItClust --select_on train --select_method F-test --train $train --test $test
+#CUDA_VISIBLE_DEVICES=-1 python -m pipelines.PBMC_pipeline $task -m MLP --select_on train --select_method F-test --train $train --test $test
+#CUDA_VISIBLE_DEVICES=-1 python -m pipelines.PBMC_pipeline $task -m GEDFN --select_on train --select_method F-test --train $train --test $test
+#CUDA_VISIBLE_DEVICES=-1 python -m pipelines.PBMC_pipeline $task -m ItClust --select_on train --select_method F-test --train $train --test $test
 
 
 ## ==== PBMC batch1 A -> B purify A using distance
@@ -99,34 +101,61 @@ task="PBMC_protocols_batch_smart"
 train="pbmc1"
 test="pbmc2"
 
+## === PBMC Zheng FACS sorted, cross-validation
+task="PBMC_Zheng_FACS"
+train="0.8"
+test="0.2"
+
+## === PBMC Zheng FACS sorted, cross-validation, for curated dataset
+task="PBMC_Zheng_FACS_curated"
+train="0.8"
+test="0.2"
+
+## === PBMC cross dataset using Kang individual 1154 as reference and Zheng as target
+task="PBMC_cross"
+train="Kang"
+test="Zheng"
+
+## === PBMC cross dataset using Ding pbmc2 10Xv2 as reference and  Zheng as target
+task="PBMC_cross"
+train="Ding"
+test="Zheng"
+
+## === PBMC cross dataset using Kang batch1 as reference and Zheng as target
+task="PBMC_cross"
+train="Kang_batch1"
+test="Zheng"
+
+## === PBMC cross dataset using Ding droplet-based data as reference and Zheng as target
+task="PBMC_cross"
+train="Ding_droplet"
+test="Zheng"
+
 ## python pipeline
 #for method in ${celltyping_python[@]}; do
-#    python -m pipelines.pipeline $task -m $method --train $train --test $test
-#    python -m pipelines.pipeline $task -m $method --select_on train --select_method Seurat --train $train --test $test
-#    python -m pipelines.pipeline $task -m $method --select_on test --select_method Seurat --train $train --test $test
-#    python -m pipelines.pipeline $task -m $method --select_on train --select_method FEAST --train $train --test $test
-#    python -m pipelines.pipeline $task -m $method --select_on train --select_method F-test --train $train --test $test
-#    python -m pipelines.pipeline $task -m $method --select_on test --select_method FEAST --train $train --test $test
+#    python -m pipelines.PBMC_pipeline $task -m $method --train $train --test $test
+#    python -m pipelines.PBMC_pipeline $task -m $method --select_on train --select_method Seurat --train $train --test $test
+#    python -m pipelines.PBMC_pipeline $task -m $method --select_on test --select_method Seurat --train $train --test $test
+#    python -m pipelines.PBMC_pipeline $task -m $method --select_on train --select_method FEAST --train $train --test $test
+#    python -m pipelines.PBMC_pipeline $task -m $method --select_on train --select_method F-test --train $train --test $test
+#    python -m pipelines.PBMC_pipeline $task -m $method --select_on test --select_method FEAST --train $train --test $test
 #done
 
 ## R pipeline 
-#for method in ${celltyping_R[@]}; do
-#    Rscript $PIPELINE_DIR/Rcode/scmap_CHETAH_pipeline.R $task $method NA NA 1000 $train $test
-#    Rscript $PIPELINE_DIR/Rcode/scmap_CHETAH_pipeline.R $task $method train Seurat 1000 $train $test
-#    Rscript $PIPELINE_DIR/Rcode/scmap_CHETAH_pipeline.R $task $method test Seurat 1000 $train $test
-#    Rscript $PIPELINE_DIR/Rcode/scmap_CHETAH_pipeline.R $task $method train FEAST 1000 $train $test
-#    Rscript $PIPELINE_DIR/Rcode/scmap_CHETAH_pipeline.R $task $method train F-test 1000 $train $test
-#    Rscript $PIPELINE_DIR/Rcode/scmap_CHETAH_pipeline.R $task $method test FEAST 1000 $train $test
-#done
-
+for method in ${celltyping_R[@]}; do
+    Rscript $PIPELINE_DIR/Rcode/scmap_CHETAH_pipeline.R $task $method NA NA 1000 $train $test
+    Rscript $PIPELINE_DIR/Rcode/scmap_CHETAH_pipeline.R $task $method train Seurat 1000 $train $test
+    Rscript $PIPELINE_DIR/Rcode/scmap_CHETAH_pipeline.R $task $method test Seurat 1000 $train $test
+    Rscript $PIPELINE_DIR/Rcode/scmap_CHETAH_pipeline.R $task $method train FEAST 1000 $train $test
+    Rscript $PIPELINE_DIR/Rcode/scmap_CHETAH_pipeline.R $task $method train F-test 1000 $train $test
+    Rscript $PIPELINE_DIR/Rcode/scmap_CHETAH_pipeline.R $task $method test FEAST 1000 $train $test
+done
 
 ### ======= for different feature numbers
 #for n_features in {100..5000..100} 
 #do
 #    echo "Select $n_features using MLP"
-#    python -m pipelines.pipeline $task -m MLP --select_on train --select_method FEAST_F-test --n_features $n_features --train $train --test $test
+#    python -m pipelines.PBMC_pipeline $task -m MLP --select_on train --select_method FEAST_F-test --n_features $n_features --train $train --test $test
 #done
-
-
 
 conda deactivate

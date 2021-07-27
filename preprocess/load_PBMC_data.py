@@ -211,7 +211,7 @@ def load_PBMC_batch1_data(data_dir, batch=None, ind=None):
     common_barcodes = set(PBMC_batch1_df['barcode']).intersection(set(adata.obs['barcode']))
     adata = adata[list(common_barcodes)]
 
-    adata.obs = adata.obs.merge(PBMC_batch1_df, left_on="barcode", right_on="barcode")
+    adata.obs = adata.obs.merge(PBMC_batch1_df, on=["barcode", "batch"], how="left")
     adata.obs.index = adata.obs["barcode"]
     adata.obs.index.name = None
     adata.var.index.name = None

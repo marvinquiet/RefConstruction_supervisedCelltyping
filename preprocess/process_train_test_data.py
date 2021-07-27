@@ -13,8 +13,8 @@ from preprocess import load_mousebrain_data
 from preprocess import load_mouseFC_data
 from preprocess import purify_cells
 
-FEAST_SC3_RSCRIPT_PATH = "/homelocal/wma36/sc_identifier/pipelines/Rcode/FEAST_selection.R"
-FEAST_FTEST_RSCRIPT_PATH = "/homelocal/wma36/sc_identifier/pipelines/Rcode/Ftest_selection.R"
+FEAST_SC3_RSCRIPT_PATH = "/homelocal/wma36/celltyping_refConstruct/pipelines/Rcode/FEAST_selection.R"
+FEAST_FTEST_RSCRIPT_PATH = "/homelocal/wma36/celltyping_refConstruct/pipelines/Rcode/Ftest_selection.R"
 
 ## ---- some functions for processing data
 def process_adata(adata, min_genes=10, min_cells=10, celltype_label="cell.type"):
@@ -25,8 +25,6 @@ def process_adata(adata, min_genes=10, min_cells=10, celltype_label="cell.type")
        4. Change all gene names into UPPER;
        5. Remove cells with no labels; 
     '''
-    # ----- import ItClust related packages
-    from ItClust.preprocessing import prefilter_cells, prefilter_genes, prefilter_specialgenes
     adata.var_names=[i.upper() for i in list(adata.var_names)]#avod some genes having lower letter
 
     ## make names unique
@@ -41,8 +39,13 @@ def process_adata(adata, min_genes=10, min_cells=10, celltype_label="cell.type")
     #prefilter_genes(adata,min_cells=min_cells) # avoiding all gene is zeros
     sc.pp.filter_genes(adata, min_cells=min_genes)
 
-    #3 prefilter_specialgene: MT and ERCC
-    prefilter_specialgenes(adata)
+    #3 prefilter_specialgene: MT and ERCC  -> from ItClust package
+    Gene1Pattern="ERCC"
+    Gene2Pattern="MT-"
+    id_tmp1=np.asarray([not str(name).startswith(Gene1Pattern) for name in adata.var_names],dtype=bool)
+    id_tmp2=np.asarray([not str(name).startswith(Gene2Pattern) for name in adata.var_names],dtype=bool)
+    id_tmp=np.logical_and(id_tmp1,id_tmp2)
+    adata._inplace_subset_var(id_tmp)
 
     ## handel exception when there are not enough cells or genes after filtering
     if adata.shape[0] < 3 or adata.shape[1] < 3:
@@ -71,12 +74,27 @@ def feature_selection_train_test(train_adata, test_adata, result_dir,
         for test
     @ min_genes/min_cells: when processing the data, the minimun requirements
     '''
-    ## curate for common cell types in train/test adata
-    #common_celltypes = set(train_adata.obs["cell.type"]).intersection(set(test_adata.obs["cell.type"]))
-    #train_cells = train_adata.obs.loc[train_adata.obs["cell.type"].isin(common_celltypes)].index
-    #test_cells = test_adata.obs.loc[test_adata.obs["cell.type"].isin(common_celltypes)].index
-    #train_adata = train_adata[train_cells]
-    #test_adata = test_adata[test_cells]
+
+    ## if feature already exists
+    feature_file = result_dir+os.sep+"features.txt"
+    if os.path.exists(feature_file):
+        ## filter cells/genes, etc
+        train_adata = process_adata(train_adata, min_genes, min_cells)
+        test_adata = process_adata(test_adata, min_genes, min_cells)
+
+        with open(feature_file) as f:
+            features = f.read().splitlines()
+        print("Number of features:", len(features))
+
+        features = set(train_adata.var_names.tolist()).intersection(set(features))
+        features = set(test_adata.var_names.tolist()).intersection(set(features))
+        features = list(features)
+        features.sort()  ## for reproducibility
+
+        ## order common genes in anndata
+        train_adata = train_adata[:, features]
+        test_adata = test_adata[:, features]
+        return train_adata, test_adata
 
     if "FEAST" == select_method or "F-test" == select_method:
         ## write file to result dir and run Rscript
@@ -158,20 +176,21 @@ def feature_selection_train_test(train_adata, test_adata, result_dir,
     test_adata = test_adata[:, features]
     return train_adata, test_adata
 
-def scale_and_visualize(train_adata, test_adata, result_dir, dr_seed=0, plot=True, 
-        plot_elements=['dataset_batch', 'cell.type'], 
-        purify=False, purify_method="distance", purify_rate=0.1):
+def scale_and_visualize(train_adata, test_adata, result_dir, dr_seed=0, scale=True,
+        plot=True, plot_elements=['dataset_batch', 'cell.type'], 
+        purify_method="", purify_rate=0.1):
     '''Scale data set and plot a dimension reduction on certain elements
     @dr_seed: seed for dimention reduction
     @plot_elements: dataset_batch, cell.type, or ind
     @purify: whether to purify the data or not
-    @purify_method: whether using distance or fit probability to purify
+    @purify_method: distance or SVM -> whether to use distance or fit probability to purify
     @purify_rate: how many to drop
     '''
-    sc.pp.scale(train_adata, zero_center=True, max_value=6)
-    sc.pp.scale(test_adata, zero_center=True, max_value=6)
+    if scale:
+        sc.pp.scale(train_adata, zero_center=True, max_value=6)
+        sc.pp.scale(test_adata, zero_center=True, max_value=6)
 
-    if purify:
+    if purify_method != "":
         if purify_method == "distance":
             train_adata = purify_cells.purify_distances(train_adata, drop_rate=purify_rate)
         elif purify_method == "SVM":

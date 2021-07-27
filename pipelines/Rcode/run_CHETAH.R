@@ -96,11 +96,11 @@ run_CHETAH <- function(ref_data, target_data, result_dir, partition_features=NA,
     if (select_on == "train") {
         features <- CHETAH_feature_selection(ref_data, result_dir, partition_features,
                                              n_features, n_clusters, select_method)
-        marker_genes <- intersect(rownames(ref_data), features)
+        marker_genes <- Reduce(intersect, list(rownames(ref_data), rownames(target_data), features))
     } else if (select_on == "test") {
         features <- CHETAH_feature_selection(target_data, result_dir, partition_features,
                                              n_features, n_clusters, select_method)
-        marker_genes <- intersect(rownames(target_data), features)
+        marker_genes <- Reduce(intersect, list(rownames(ref_data), rownames(target_data), features))
     } else if (select_on == "NA") {
         features_file <- file.path(result_dir, "features.txt")
         features <- NA
@@ -138,7 +138,7 @@ run_CHETAH <- function(ref_data, target_data, result_dir, partition_features=NA,
 
     res <- CHETAHclassifier(input = target_data, ref_cells = ref_data)
     res <- Classify(input = res, 0) ## make the threshold
-    saveRDS(res, file.path(result_dir, paste0(prefix, "_result.RDS")))
+    #saveRDS(res, file.path(result_dir, paste0(prefix, "_result.RDS")))
     return(res)
 }
 

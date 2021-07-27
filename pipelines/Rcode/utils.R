@@ -28,3 +28,16 @@ ref_downsample <- function(ref_data, size, seed=0) {
     }
     return(ref_data)
 }
+
+## filter data to express at least in 10 cells with 10 genes
+filter_sce = function(sce, min_genes=10, min_cells=10) {
+    ### === filter sce object
+    # @sce: sce object
+    # @min_genes: minimum genes expressed
+    # @min_cells: minimum cells expressed
+    n_exprsgenes = rowSums(counts(sce) > 0)
+    n_exprscells = colSums(counts(sce) > 0)
+    selected_genes = which(n_exprsgenes >= 10)
+    selected_cells = which(n_exprscells >= 10)
+    return (sce[selected_genes, selected_cells])
+}

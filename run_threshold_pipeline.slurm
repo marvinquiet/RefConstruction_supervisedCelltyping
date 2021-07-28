@@ -5,9 +5,12 @@
 #SBATCH --cpus-per-task=10
 
 source ~/.bashrc
-conda activate /home/wma36/gpu/envs/celltyping
+PROJECT_PATH=""
+ENV_PATH=""
 
-cd /home/wma36/gpu/celltyping_refConstruct/
+conda activate $ENV_PATH/celltyping  
+
+cd $PROJECT_PATH
 
 
 ## 1. PBMC_batch1_indS1_to_indS5

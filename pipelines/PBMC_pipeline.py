@@ -8,7 +8,7 @@ from pipelines import method_utils, dataloading_utils
 from preprocess.process_train_test_data import *
 
 if __name__ == "__main__":
-    data_dir = "/home/wma36/gpu/data"
+    data_dir = "~/gpu/data"
 
     ## parse arguments
     parser = argparse.ArgumentParser(description="Celltyping pipeline.")
@@ -43,13 +43,13 @@ if __name__ == "__main__":
     if args.data_source in ["PBMC_batch1_ind", "PBMC_batch1_ABC", "PBMC_batch2", 
             "PBMC_batch1_batchtoind", "PBMC_batch1_multiinds"
             ]:
-        pipeline_dir = "/home/wma36/gpu/celltyping_refConstruct/pipelines/result_PBMC_collections"
+        pipeline_dir = "pipelines/result_PBMC_collections"
 
     if args.data_source in ["PBMC_protocols_pbmc1", "PBMC_protocols_batch_smart"]:
-        pipeline_dir = "/home/wma36/gpu/celltyping_refConstruct/pipelines/result_PBMC_protocols_collections"
+        pipeline_dir = "pipelines/result_PBMC_protocols_collections"
 
     if args.data_source in ["PBMC_Zheng_FACS", "PBMC_Zheng_FACS_curated", "PBMC_cross"]:
-        pipeline_dir = "/home/wma36/gpu/celltyping_refConstruct/pipelines/result_PBMC_Zheng_collections"
+        pipeline_dir = "pipelines/result_PBMC_Zheng_collections"
 
     result_prefix = pipeline_dir+os.sep+"result_"+args.data_source+'_'+\
         args.train+'_to_'+args.test

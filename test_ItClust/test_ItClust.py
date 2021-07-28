@@ -58,8 +58,3 @@ def ItClust_process(data_dir, result_dir):
 
     return clf
 
-if __name__ == '__main__':
-    batch2_data_dir = "/home/wma36/gpu/data/PBMC_batch2"
-    result_dir = "/home/wma36/gpu/sc_identifier/test_ItClust/result"
-    clf = ItClust_process(batch2_data_dir, result_dir)
-

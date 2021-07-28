@@ -56,7 +56,7 @@ def plot_metrics_together(metrics_dict, metrics="Acc", prefix=None):
 
 
 if __name__ == '__main__':
-    covariate_dir = "result_TrainingCovariate_collections/"
+    covariate_dir = "pipelines/result_TrainingCovariate_collections/"
 
     #prefix = "Mousebrain_Region_and_Dataset_Effect" ## comparing individual effect, dataset effect and region effect
     prefix = "PBMC_ConditonEffects_Major"

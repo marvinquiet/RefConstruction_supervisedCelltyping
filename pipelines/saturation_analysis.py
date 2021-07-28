@@ -135,38 +135,38 @@ if __name__ == '__main__':
     ##### ================ For saturation per individual
     '''
     ### === FC sub-celltypes saturation
-    res_dir = "/home/wma36/gpu/celltyping_refConstruct/pipelines/result_saturation_collections/mousebrain_FC_sub"
+    res_dir = "pipelines/result_saturation_collections/mousebrain_FC_sub"
     sep_index = 6
     columns = [8062, 8000, 14708, 9024, 9040, 13885]
 
     ### === FC major cell types saturation
-    res_dir = "/home/wma36/gpu/celltyping_refConstruct/pipelines/result_saturation_collections/mousebrain_FC_major"
+    res_dir = "pipelines/result_saturation_collections/mousebrain_FC_major"
     sep_index = 5
     columns = [8062, 8000, 14708, 9024, 9040, 13885]
 
     ### === PBMC Kang batch1 individual effect
-    res_dir = "/home/wma36/gpu/celltyping_refConstruct/pipelines/result_saturation_collections/PBMC_Kang_individualeffect"
+    res_dir = "pipelines/result_saturation_collections/PBMC_Kang_individualeffect"
     sep_index = 6
     columns = [1831, 1883, 1714, 1537, 1450, 2148, 1503]
 
     ### === PBMC Kang batch2 batch effect
-    res_dir = "/home/wma36/gpu/celltyping_refConstruct/pipelines/result_saturation_collections/PBMC_Kang_batcheffect"
+    res_dir = "pipelines/result_saturation_collections/PBMC_Kang_batcheffect"
     sep_index = 9
     columns = [1027, 3138, 2180, 552, 645, 2250, 2451, 2376]
 
     ### === PBMC Kang batch2 condition effect
-    res_dir = "/home/wma36/gpu/celltyping_refConstruct/pipelines/result_saturation_collections/PBMC_Kang_conditioneffect"
+    res_dir = "pipelines/result_saturation_collections/PBMC_Kang_conditioneffect"
     sep_index = 9
     columns = [1363, 2703, 1998, 797, 641, 1755, 2275, 2914]
 
     ### === PBMC Kang batch2 combined effect
-    res_dir = "/home/wma36/gpu/celltyping_refConstruct/pipelines/result_saturation_collections/PBMC_Kang_combinedeffect"
+    res_dir = "pipelines/result_saturation_collections/PBMC_Kang_combinedeffect"
     sep_index = 9
     columns = [2390, 5841, 4178, 1349, 1286, 4005, 4726, 5290]
     '''
 
     ### === mouse brain cross datasets
-    #res_dir = "/home/wma36/gpu/celltyping_refConstruct/pipelines/result_saturation_collections/mousebrain_FC_cross"
+    #res_dir = "pipelines/result_saturation_collections/mousebrain_FC_cross"
     #sep_index = 8
     ##columns = [1278, 1055, 1506, 1751, 3784, 2512, 17906, 33230, 14808]
     #columns = None
@@ -178,14 +178,14 @@ if __name__ == '__main__':
     #        prefix=prefix, columns=columns)
 
     #### ===================== For saturation on individuals
-    result_prefix = "/home/wma36/gpu/celltyping_refConstruct/pipelines/result_saturation_collections"
+    result_prefix = "pipelines/result_saturation_collections"
     result_folders = os.listdir(result_prefix)
     for fd in result_folders:
         res_dir = result_prefix+os.sep+fd
         plot_downsample_saturation_line(res_dir, prefix=fd, add_type="inds")
 
     ##### ====================  For saturation on downsampling
-    result_prefix = "/home/wma36/gpu/celltyping_refConstruct/pipelines/result_saturation_downsample_collections"
+    result_prefix = "pipelines/result_saturation_downsample_collections"
     result_folders = os.listdir(result_prefix)
     for fd in result_folders:
         res_dir = result_prefix+os.sep+fd

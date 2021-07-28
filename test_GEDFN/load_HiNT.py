@@ -2,7 +2,8 @@ import os
 import numpy as np
 import pandas as pd
 
-data_dir = "/home/wma36/gpu/data/GeneNetworks"
+data_path = ""
+data_dir = data_path+os.sep+"GeneNetworks"
 HiNTfile = data_dir+os.sep+"HomoSapiens_htb_hq.txt"
 
 def generate_HiNT_adjacency():

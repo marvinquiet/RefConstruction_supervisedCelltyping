@@ -8,7 +8,7 @@ from pipelines import method_utils, dataloading_utils
 from preprocess.process_train_test_data import *
 
 if __name__ == "__main__":
-    data_dir = "/home/wma36/gpu/data"
+    data_dir = "~/gpu/data"
 
     ## parse arguments
     import argparse
@@ -34,7 +34,7 @@ if __name__ == "__main__":
             default=0, type=int)
 
     args = parser.parse_args()
-    pipeline_dir = "/home/wma36/gpu/celltyping_refConstruct/pipelines/result_Pancreas_collections"
+    pipeline_dir = "pipelines/result_Pancreas_collections"
     result_prefix = pipeline_dir+os.sep+"result_"+args.data_source+'_'+\
         args.train+'_to_'+args.test
     os.makedirs(result_prefix, exist_ok=True)

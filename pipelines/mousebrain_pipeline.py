@@ -7,7 +7,7 @@ from pipelines import method_utils, dataloading_utils
 from preprocess.process_mousebrain_train_test import *
 
 if __name__ == "__main__":
-    data_dir = "/home/wma36/gpu/data"
+    data_dir = "~/gpu/data"
 
     ## parse arguments
     parser = argparse.ArgumentParser(description="Mouse brain celltyping pipeline.")
@@ -40,9 +40,9 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     if args.data_source in ["allenbrain_ss", "allenbrain_10x", "allenbrain_cross"]:
-        pipeline_dir = "/home/wma36/gpu/celltyping_refConstruct/pipelines/result_Allenbrain_collections"
+        pipeline_dir = "pipelines/result_Allenbrain_collections"
     else:
-        pipeline_dir = "/home/wma36/gpu/celltyping_refConstruct/pipelines/result_Mousebrain_collections"
+        pipeline_dir = "pipelines/result_Mousebrain_collections"
     result_prefix = pipeline_dir+os.sep+"result_"+args.data_source+'_'+\
         args.train+'_to_'+args.test
     os.makedirs(result_prefix, exist_ok=True)

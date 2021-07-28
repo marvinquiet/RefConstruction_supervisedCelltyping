@@ -173,7 +173,7 @@ def plot_feature_number(pipeline_dir, prefix, method="MLP", metrics="Acc"):
     plt.savefig(pipeline_dir+os.sep+prefix+metrics+'_n_features.png')
 
 if __name__ == '__main__':
-    pipeline_dir = "/home/wma36/gpu/celltyping_refConstruct/pipelines/result_Pancreas_collections/result_pancreas_seg_to_muraro"
+    pipeline_dir = "pipelines/result_Pancreas_collections/result_pancreas_seg_to_muraro"
     sub_dirs = next(os.walk(pipeline_dir))[1]
 
     prefix=os.path.basename(pipeline_dir).replace('result_', '')

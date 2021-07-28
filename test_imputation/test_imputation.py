@@ -42,9 +42,9 @@ def run_scVI(result_dir):
     '''
 
     #TODO: this place is dirty, need to clean up later...
-    scVI_envs_dir = "/homelocal/wma36/envs/scvi"
-    scVI_script_dir = "/homelocal/wma36/celltyping_refConstruct/test_imputation/test_scVI.py"
-    conda_dir = "/home/wma36/miniconda3/etc/profile.d/conda.sh"
+    scVI_envs_dir = "envs/scvi"
+    scVI_script_dir = "test_imputation/test_scVI.py"
+    conda_dir = "~/miniconda3/etc/profile.d/conda.sh"
 
     import subprocess
     ## pyton -V is used to check python version
@@ -117,7 +117,7 @@ if __name__ == '__main__':
     args.select_method = "F-test"
     args.n_features = 1000
 
-    pipeline_dir = "/home/wma36/gpu/celltyping_refConstruct/pipelines/result_imputation_collections"
+    pipeline_dir = "pipelines/result_imputation_collections"
     result_prefix = pipeline_dir+os.sep+args.imputation+os.sep+"result_"+args.data_source+'_'+\
         args.train+'_to_'+args.test
     os.makedirs(result_prefix, exist_ok=True)

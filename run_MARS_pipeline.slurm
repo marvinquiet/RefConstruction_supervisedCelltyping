@@ -5,9 +5,13 @@
 #SBATCH --cpus-per-task=32
 
 source ~/.bashrc
-conda activate /home/wma36/gpu/envs/mars  ## mars environment
 
-cd /home/wma36/gpu/celltyping_refConstruct/
+PROJECT_PATH=""
+ENV_PATH=""
+
+conda activate $ENV_PATH/mars  ## mars environment
+
+cd $PROJECT_PATH
 
 ## 1. PBMC_batch1_indS1_to_indS5
 task="PBMC_batch1_ind"

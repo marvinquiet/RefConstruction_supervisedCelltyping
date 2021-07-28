@@ -1,15 +1,18 @@
 #!/bin/bash
 #SBATCH --job-name=PBMC
-#SBATCH --output=celltyping_PBMC_cross_Ding.out
+#SBATCH --output=celltyping_PBMC.out
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=32
 
 source ~/.bashrc
-conda activate /home/wma36/gpu/envs/celltyping
+PROJECT_PATH=""
+ENV_PATH=""
 
-cd /home/wma36/gpu/celltyping_refConstruct
+conda activate $ENV_PATH/celltyping
 
-PIPELINE_DIR="/home/wma36/gpu/celltyping_refConstruct/pipelines"
+cd $PROJECT_PATH
+
+PIPELINE_DIR=$PROJECT_PATH/pipelines
 
 declare -a celltyping_python=("MLP" "GEDFN" "ItClust" "RF" "SVM_RBF" "SVM_linear")
 #declare -a celltyping_python=("MLP_GO" "MLP_CP")
@@ -37,14 +40,6 @@ test="B"
 task="PBMC_batch2"
 train="control"
 test="stimulated"
-
-## python pipeline
-# **jiaying**: using CUDA_VISIBLE_DEVICES=-1 and 
-# directly `sh thisfile.slurm` instead of `slurm thisfile.slurm`
-#CUDA_VISIBLE_DEVICES=-1 python -m pipelines.PBMC_pipeline $task -m MLP --select_on train --select_method F-test --train $train --test $test
-#CUDA_VISIBLE_DEVICES=-1 python -m pipelines.PBMC_pipeline $task -m GEDFN --select_on train --select_method F-test --train $train --test $test
-#CUDA_VISIBLE_DEVICES=-1 python -m pipelines.PBMC_pipeline $task -m ItClust --select_on train --select_method F-test --train $train --test $test
-
 
 ## ==== PBMC batch1 A -> B purify A using distance
 task="PBMC_batch1_ABC_purify_dist"

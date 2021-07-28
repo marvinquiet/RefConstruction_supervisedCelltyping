@@ -3,11 +3,15 @@
 #SBATCH --output=celltyping_Pancreas.out
 #SBATCH --gres=gpu:1
 source ~/.bashrc
-conda activate /home/wma36/gpu/sc_identifier/envs/desc_tfv1
 
-cd /homelocal/wma36/sc_identifier
+PROJECT_PATH=""
+ENV_PATH=""
 
-PIPELINE_DIR="/home/wma36/gpu/sc_identifier/pipelines"
+conda activate $ENV_PATH/celltyping  
+
+cd $PROJECT_PATH
+
+PIPELINE_DIR=$PROJECT_PATH/pipelines
 
 declare -a celltyping_python=("MLP" "GEDFN" "ItClust" "SVM_RBF" "SVM_linear" "RF")
 declare -a celltyping_R=("scmap" "CHETAH")
@@ -40,35 +44,11 @@ task="pancreas_seg_mix"
 train="Healthy"
 test="T2D"
 
-## python pipeline
-for method in ${celltyping_python[@]}; do
-    python -m pipelines.pipeline $task -m $method --select_on test --select_method Seurat --train $train --test $test
-    python -m pipelines.pipeline $task -m $method --select_on test --select_method FEAST --train $train --test $test
-done
-
-## R pipeline
-for method in ${celltyping_R[@]}; do
-    Rscript $PIPELINE_DIR/Rcode/scmap_CHETAH_pipeline.R $task $method test Seurat 1000 $train $test
-    Rscript $PIPELINE_DIR/Rcode/scmap_CHETAH_pipeline.R $task $method test FEAST 1000 $train $test
-done
-
 
 ## Seg Healthy+T2D -> Healthy
 task="pancreas_seg_mix"
 train="T2D"
 test="Healthy"
-
-## python pipeline
-for method in ${celltyping_python[@]}; do
-    python -m pipelines.pipeline $task -m $method --select_on test --select_method Seurat --train $train --test $test
-    python -m pipelines.pipeline $task -m $method --select_on test --select_method FEAST --train $train --test $test
-done
-
-## R pipeline
-for method in ${celltyping_R[@]}; do
-    Rscript $PIPELINE_DIR/Rcode/scmap_CHETAH_pipeline.R $task $method test Seurat 1000 $train $test
-    Rscript $PIPELINE_DIR/Rcode/scmap_CHETAH_pipeline.R $task $method test FEAST 1000 $train $test
-done
 
 
 ## Seg+Xin -> Muraro

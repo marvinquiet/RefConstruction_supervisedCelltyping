@@ -1,14 +1,18 @@
 #!/bin/bash
 #SBATCH --job-name=Mousebrain
-#SBATCH --output=celltyping_datasets_allen_cross_R.out
+#SBATCH --output=celltyping_mousebrain.out
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=32
 
 source ~/.bashrc
-conda activate /home/wma36/gpu/envs/celltyping
+PROJECT_PATH=""
+ENV_PATH=""
 
-cd /home/wma36/gpu/celltyping_refConstruct
-PIPELINE_DIR="/home/wma36/gpu/celltyping_refConstruct/pipelines"
+conda activate $ENV_PATH/celltyping  
+
+cd $PROJECT_PATH
+
+PIPELINE_DIR=$PROJECT_PATH/pipelines
 
 declare -a celltyping_python=("MLP" "GEDFN" "ItClust" "RF" "SVM_RBF" "SVM_linear")
 declare -a celltyping_R=("scmap" "CHETAH")

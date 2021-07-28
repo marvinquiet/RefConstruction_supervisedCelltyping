@@ -67,7 +67,7 @@ if __name__ == '__main__':
     args.select_method = "F-test"
     args.n_features = 1000
 
-    pipeline_dir = "/home/wma36/gpu/celltyping_refConstruct/pipelines/result_batchremoval_collections"
+    pipeline_dir = "pipelines/result_batchremoval_collections"
     result_prefix = pipeline_dir+os.sep+args.batcheffect+os.sep+"result_"+args.data_source+'_'+\
         args.train+'_to_'+args.test
     os.makedirs(result_prefix, exist_ok=True)

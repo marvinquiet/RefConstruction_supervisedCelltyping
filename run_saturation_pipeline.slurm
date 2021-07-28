@@ -1,13 +1,16 @@
 #!/bin/bash
 #SBATCH --job-name=saturation
-#SBATCH --output=celltyping_datasets_saturation_50times_cells.out
+#SBATCH --output=celltyping_datasets_saturation.out
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=32
 
 source ~/.bashrc
-conda activate /home/wma36/gpu/envs/celltyping
+PROJECT_PATH=""
+ENV_PATH=""
 
-cd /home/wma36/gpu/celltyping_refConstruct
+conda activate $ENV_PATH/celltyping  
+
+cd $PROJECT_PATH
 
 declare -a sample_seeds=(5866 9558 3578 8268 2281 4617 2289 1553 4104 8725 9861 2407 5081 1618 1208 5409 7735 9171 1649 5796 7113 5180 3350 9052 7815 7253 8541 4267 1020 8989 230 1528 6534 18 8086 5458 3996 5328 1031 3130) ## sampled by random.sample(range(0, 10000), k=10) with random.seed(0)
 #declare -a sample_seeds=(0 6311 6890 663 4242 8376 7961 6634 4969 7808)

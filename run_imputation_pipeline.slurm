@@ -1,13 +1,16 @@
 #!/bin/bash
 #SBATCH --job-name=imputation
-#SBATCH --output=celltyping_imputation_SAVER.out
+#SBATCH --output=celltyping_imputation.out
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=10
 
 source ~/.bashrc
-conda activate /home/wma36/gpu/envs/celltyping  ## mars environment
+PROJECT_PATH=""
+ENV_PATH=""
 
-cd /home/wma36/gpu/celltyping_refConstruct/
+conda activate $ENV_PATH/celltyping  
+
+cd $PROJECT_PATH
 
 #imputation="MAGIC"
 #imputation="scVI"

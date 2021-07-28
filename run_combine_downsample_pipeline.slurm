@@ -1,13 +1,17 @@
 #!/bin/bash
 #SBATCH --job-name=Downsample
-#SBATCH --output=celltyping_combine_effect_MousebrainCurated.out
+#SBATCH --output=celltyping_combine_effect.out
 #SBATCH --gres=gpu:1
+
 source ~/.bashrc
-conda activate /home/wma36/gpu/sc_identifier/envs/desc_tfv1
 
-cd /homelocal/wma36/sc_identifier
+PROJECT_PATH=""
+ENV_PATH=""
 
-PIPELINE_DIR="/home/wma36/gpu/sc_identifier/pipelines"
+conda activate $ENV_PATH/mars  ## mars environment
+
+cd $PROJECT_PATH
+
 
 ## fix method and feature selection
 method="MLP"

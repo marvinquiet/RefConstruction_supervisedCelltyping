@@ -8,7 +8,7 @@ from pipelines import method_utils, dataloading_utils
 from preprocess.process_train_test_data import *
 
 if __name__ == "__main__":
-    data_dir = "/home/wma36/gpu/data"
+    data_dir = "~/gpu/data"
 
     ## parse arguments
     parser = argparse.ArgumentParser(description="Test for saturation pipeline.")
@@ -29,9 +29,9 @@ if __name__ == "__main__":
     args.n_features = 1000
 
     if args.downsample:
-        pipeline_dir = "/home/wma36/gpu/celltyping_refConstruct/pipelines/result_saturation_downsample_collections"
+        pipeline_dir = "pipelines/result_saturation_downsample_collections"
     else:
-        pipeline_dir = "/home/wma36/gpu/celltyping_refConstruct/pipelines/result_saturation_collections"
+        pipeline_dir = "pipelines/result_saturation_collections"
     result_collections_dir = pipeline_dir+os.sep+"result_"+args.data_source+'_'+args.train.split('_')[0]+'s'
     result_prefix = result_collections_dir+os.sep+str(args.sample_seed) ## to distinguish PBMC tasks
     os.makedirs(result_prefix, exist_ok=True)

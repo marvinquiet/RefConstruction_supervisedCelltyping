@@ -1,13 +1,17 @@
 #!/bin/bash
 #SBATCH --job-name=TrainingCovariate
-#SBATCH --output=training_covariate_MouseBothCortex.out
+#SBATCH --output=celltyping_training_covariate.out
 #SBATCH --gres=gpu:1
 source ~/.bashrc
-conda activate /home/wma36/gpu/sc_identifier/envs/desc_tfv1
+PROJECT_PATH=""
+ENV_PATH=""
 
-cd /homelocal/wma36/sc_identifier
+conda activate $ENV_PATH/celltyping  
 
-PIPELINE_DIR="/home/wma36/gpu/sc_identifier/pipelines"
+cd $PROJECT_PATH
+
+
+PIPELINE_DIR=$PROJECT_PATH/pipelines
 
 ## fix method and feature selection
 method="MLP"

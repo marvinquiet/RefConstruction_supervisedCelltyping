@@ -18,22 +18,22 @@ test <- args[7]
 
 if (data_source %in% c("PBMC_batch1_ind", "PBMC_batch1_ABC", "PBMC_batch2", 
                 "PBMC_batch1_batchtoind", "PBMC_protocols_pbmc1", "PBMC_protocols_batch_smart"))
-    pipeline_dir = "/home/wma36/gpu/celltyping_refConstruct/pipelines/result_PBMC_collections"
+    pipeline_dir = "pipelines/result_PBMC_collections"
 if (data_source %in% c("PBMC_protocols_pbmc1", "PBMC_protocols_batch_smart"))
-    pipeline_dir = "/home/wma36/gpu/celltyping_refConstruct/pipelines/result_PBMC_protocols_collections"
+    pipeline_dir = "result_PBMC_protocols_collections"
 if (data_source %in% c("PBMC_Zheng_FACS", "PBMC_Zheng_FACS_curated", "PBMC_cross"))
-    pipeline_dir = "/home/wma36/gpu/celltyping_refConstruct/pipelines/result_PBMC_Zheng_collections"
+    pipeline_dir = "pipelines/result_PBMC_Zheng_collections"
 if (data_source %in% c("pancreas", "pancreas_seg_cond", "pancreas_custom",
                 "pancreas_seg_mix", "pancreas_multi_to_multi"))
-    pipeline_dir = "/home/wma36/gpu/celltyping_refConstruct/pipelines/result_Pancreas_collections"
+    pipeline_dir = "pipelines/result_Pancreas_collections"
 if (data_source %in% c("mousebrain_FC", "mousebrain_FC_sub", "mousebrain_HC", "mousebrain_HC_sub",
                 "mousebrain_region", "mousebrain_FC_stage", "mousebrain_FC_stage_sub", "mousebrain_FC_datasets",
                 "mousebrain_FC_datasets_multiinds", "mousebrain_FC_datasets_multiinds_sample",
                 "mousebrain_FC_multiinds", "mousebrain_FC_multiinds_sub", "mousebrain_FC_multiinds_sample",
                 "mousebrain_FC_multiinds_sub_sample"))
-    pipeline_dir = "/home/wma36/gpu/celltyping_refConstruct/pipelines/result_Mousebrain_collections"
+    pipeline_dir = "pipelines/result_Mousebrain_collections"
 if (data_source %in% c("allenbrain_ss", "allenbrain_10x", "allenbrain_cross"))
-    pipeline_dir = "/home/wma36/gpu/celltyping_refConstruct/pipelines/result_Allenbrain_collections"
+    pipeline_dir = "pipelines/result_Allenbrain_collections"
 
 result_prefix <- file.path(pipeline_dir, 
                 paste("result", data_source, train, 'to', test, sep='_'))

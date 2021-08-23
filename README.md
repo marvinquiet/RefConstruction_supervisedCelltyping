@@ -1,4 +1,7 @@
 # Reference construction strategies for single-cell supervised celltyping
+
+[![DOI](https://zenodo.org/badge/362991463.svg)](https://zenodo.org/badge/latestdoi/362991463)
+
 We perform extensive real data analyses to systematically evalute several key factors in supervised celltyping tasks, including: feature selection, prediction method, data preprocessing and the choice of the reference dataset. In our paper, we benchmark **9** classifiers (MLP, SVM with Radial Basis Function kernel , SVM with linear kernel, Random Forest, GEDFN, scmap, CHETAH, ItClust and MARS) along with **6** feature selection strategies. We also investigate **the impact of data preprocessing** (e.g., batch effect correction between reference and target; data imputation on both reference and target), **size of reference**, **number of cell types in reference** and **different annotation methods in target**. Furthermore, we focus on showing how **discrepancies between reference and target data** would affect the prediction performance. In the end, we explore the **strategies of pooling and purifying** reference data. 
 
 Our paper is currently under review.

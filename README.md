@@ -1,4 +1,5 @@
-# Reference construction strategies for single-cell supervised celltyping
+# Evaluation of some aspects in supervised cell type identification for single-cell RNA-seq: classifier, feature selection, and reference construction
+
 
 [![DOI](https://zenodo.org/badge/362991463.svg)](https://zenodo.org/badge/latestdoi/362991463)
 
@@ -40,3 +41,6 @@ We have stored the package requirements under each virtual environment to `envs/
 #### Datasets
 
 Once our paper gets published, we will update this section
+
+
+Our code is released under MIT license.
